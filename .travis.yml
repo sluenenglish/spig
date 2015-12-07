@@ -3,6 +3,6 @@ python:
   - 2.7
   - 3.4
 install:
-  - sudo pip install pandas
+  - pip install pandas
 script:
   - python -m unittest discover
