@@ -1,11 +1,15 @@
 """Test for the generic game class"""
 from unittest import TestCase
-from spig import Performance
+import spig
+from pandas.util.testing import assert_frame_equal
+
+import pandas as pd
+
 
 class TestPerformance(TestCase):
     """Test case for a Performance class"""
 
     def test_init(self):
-        data = [1,4,5,6,7]
-        p = Performace(data)
-        self.assertEqual(p.data, data)
+        data = pd.DataFrame([{'a' : 1}, {'a' : 4}])
+        p = spig.Performance(data)
+        assert_frame_equal(p.data, data)
