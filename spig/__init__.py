@@ -1,1 +1,1 @@
-from Performance import *
+from .performance import Performance
