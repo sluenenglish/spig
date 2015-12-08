@@ -1,5 +1,8 @@
 from __future__ import division
+
 import pandas as pd
+import numpy as np
+import scipy.stats as st
 
 
 class TwoLevelModel(object):
@@ -26,7 +29,8 @@ class TwoLevelModel(object):
 
 
     def estimate_parameters(self):
-        self.Y_stats = self.data.groupby(self.grouping).agg(['mean', 'count', 'sem'])[self.measure]
+        self.Y_stats = self.data.groupby(self.grouping).agg(['mean',
+                                                             'count', 'sem'])[self.measure]
         self.Y_stats.rename(columns={'mean' : 'y_i',
                                      'count' : 'counts',
                                      'sem' : 'sigma'}, inplace=True)
@@ -48,6 +52,27 @@ class TwoLevelModel(object):
                                                       self.tau2 / (s.sigma ** 2 + self.tau2),
                                                       axis = 1)
 
+    def common_mean_comparison(self):
+
+        try:
+            self.Y_stats
+        except:
+            self.estimate_parameters()
+
+        self.Y_stats['Z1'] = self.Y_stats.apply(lambda s : (s.y_i - self.mu) / s.sigma, axis = 1)
+        self.Y_stats['P1'] = self.Y_stats.apply(lambda s : st.norm.cdf(s.Z1), axis = 1)
+
+
+    def random_effects_comparison(self):
+
+        try:
+            self.Y_stats
+        except:
+            self.estimate_parameters()
+
+        self.Y_stats['Z2'] = self.Y_stats.apply(lambda s :
+                        np.sqrt(1 - s.weight_i) * ((self.mu - s.y_i) / s.sigma), axis = 1)
+        self.Y_stats['P2'] = self.Y_stats.apply(lambda s : st.norm.cdf(s.Z2), axis = 1)
 
 
 
