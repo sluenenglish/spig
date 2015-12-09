@@ -1,8 +1,11 @@
 language: python
 python:
   - 2.7
-  - 3.4
+virtualenv:
+  system_site_packages: true - 3.4
+before_install:
+  - sudo apt-get install python-scipy
 install:
-  - pip install pandas
+  - travis_wait 20 pip install -r requirements.txt
 script:
   - python -m unittest discover

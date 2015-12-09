@@ -1,1 +1,1 @@
-from .performance import Performance
+from .performance import TwoLevelModel
