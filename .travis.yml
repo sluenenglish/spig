@@ -4,6 +4,8 @@ python:
 virtualenv:
   system_site_packages: true - 3.4
 before_install:
+  - sudo apt-get install libblas-dev
+  - sudo apt-get install liblapack-dev 
   - sudo apt-get install python-scipy
 install:
   - travis_wait 20 pip install -r requirements.txt
