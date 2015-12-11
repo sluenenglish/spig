@@ -34,8 +34,8 @@ class TestTwoLevelModel(TestCase):
                          self.data.groupby('grouping').ngroups)
 
 
+    def test_plot(self):
 
-
-
-
-
+        self.model.estimate_parameters()
+        self.model.random_effects_comparison()
+        self.model.plot()

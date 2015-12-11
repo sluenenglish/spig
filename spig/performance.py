@@ -1,7 +1,8 @@
 from __future__ import division
 
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import scipy.stats as st
 
 
@@ -52,6 +53,9 @@ class TwoLevelModel(object):
                                                       self.tau2 / (s.sigma ** 2 + self.tau2),
                                                       axis = 1)
 
+        self.Y_stats['theta_i'] = self.Y_stats.apply(lambda s : s.weight_i * s.y_i + (1 - s.weight_i) * self.mu, axis = 1)
+
+
     def common_mean_comparison(self):
 
         try:
@@ -73,6 +77,37 @@ class TwoLevelModel(object):
         self.Y_stats['Z2'] = self.Y_stats.apply(lambda s :
                         np.sqrt(1 - s.weight_i) * ((self.mu - s.y_i) / s.sigma), axis = 1)
         self.Y_stats['P2'] = self.Y_stats.apply(lambda s : st.norm.cdf(s.Z2), axis = 1)
+
+
+    def plot(self):
+
+        lo = self.Y_stats.loc[self.Y_stats.idxmin()['y_i']]
+        hi = self.Y_stats.loc[self.Y_stats.idxmax()['y_i']]
+
+        lo_limit = lo.theta_i - 1.96 * lo.sigma
+        hi_limit = hi.theta_i + 1.96 * hi.sigma
+
+        x_axis = np.linspace(lo_limit, hi_limit, num=100)
+
+        fig = plt.figure()
+        sp = fig.add_subplot(111)
+
+        sp.plot(x_axis, st.norm.pdf(x_axis, self.mu, self.tau2 ** 0.5), label=r'$\theta_i \mid \mu$')
+
+        for i, row in self.Y_stats.iterrows():
+            #print row['theta_i']
+            sp.plot(x_axis, st.norm.pdf(x_axis, row.theta_i, row.sigma), label=i)
+
+        sp.legend(loc='upper_left')
+
+        return fig
+
+
+
+
+
+
+
 
 
 
