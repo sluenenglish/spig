@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Hypothesis tests
+.hypothesis/eval_source/
