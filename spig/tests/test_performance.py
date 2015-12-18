@@ -1,8 +1,19 @@
 from unittest import TestCase
 import spig
 from pandas.util.testing import assert_frame_equal
+from hypothesis import given, example, assume
+from hypothesis.strategies import text, floats, fixed_dictionaries, composite, lists, sampled_from
 
 import pandas as pd
+
+@composite
+def generate_data_and_keys(draw):
+    measure = draw(text(min_size=1))
+    grouping = draw(text(min_size=1))
+    #assume(measure != grouping)
+    groups = draw(lists(text(), min_size=1, max_size=3))
+    data = draw(lists(fixed_dictionaries({grouping: sampled_from(groups), measure:floats()}), max_size=20))
+    return data, measure, grouping
 
 
 class TestTwoLevelModel(TestCase):
@@ -19,11 +30,18 @@ class TestTwoLevelModel(TestCase):
         self.model = spig.TwoLevelModel(self.data, 'measure', 'grouping')
 
 
-    def test_init(self):
+    @given(data_and_keys=generate_data_and_keys())
+    def test_init(self, data_and_keys):
+        data, measure, grouping = data_and_keys
 
-        assert_frame_equal(self.model.data, self.data)
-        self.assertEqual(self.model.measure, 'measure')
-        self.assertEqual(self.model.grouping, 'grouping')
+        data_df = pd.DataFrame(data)
+
+        model = spig.TwoLevelModel(data_df, measure, grouping)
+
+        assert_frame_equal(model.data, data_df)
+        self.assertEqual(model.measure, measure)
+        self.assertEqual(model.grouping, grouping)
+
 
 
     def test_estimate_parameters(self):
