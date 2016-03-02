@@ -1,1 +1,1 @@
-A library for Speigalholter
+A library for hierarchical models
